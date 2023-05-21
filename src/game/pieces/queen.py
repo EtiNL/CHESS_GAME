@@ -1,4 +1,4 @@
-from ..board import board
+from ..board.board import Board
 
 class Queen:
     def __init__(self,color,file,row):

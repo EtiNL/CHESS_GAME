@@ -1,5 +1,5 @@
 import itertools
-from ..board import board
+from ..board.board import Board
 
 #creation of the king class
 class King:
