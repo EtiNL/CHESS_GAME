@@ -1,5 +1,4 @@
 import itertools
-from ..board.board import Board
 
 #creation of the king class
 class King:
@@ -44,11 +43,8 @@ class King:
                     if piece.piece_type=='r':
                         if piece.first_move==1:
                             if board.is_checked()!='w':
-                                black_pieces_vision=[]
                                 all_pieces_position = board.get_one_color_position('b')+board.get_one_color_position('w')
-                                for piece in board.pieces['b']:
-                                    black_pieces_vision+=piece.vision(board)
-                                if [4,1] not in black_pieces_vision and [2,1] not in all_pieces_position and [3,1] not in all_pieces_position and [4,1] not in all_pieces_position:
+                                if [2,1] not in all_pieces_position and [3,1] not in all_pieces_position and [4,1] not in all_pieces_position:
                                     vision.append([3,1])
 
                 #right castling
@@ -57,11 +53,8 @@ class King:
                     if piece.piece_type=='r':
                         if piece.first_move==1:
                             if board.is_checked()!='w':
-                                black_pieces_vision=[]
                                 all_pieces_position = board.get_one_color_position('b')+board.get_one_color_position('w')
-                                for piece in board.pieces['b']:
-                                    black_pieces_vision+=piece.vision(board)
-                                if [6,1] not in black_pieces_vision and [6,1] not in all_pieces_position and [7,1] not in all_pieces_position:
+                                if [6,1] not in all_pieces_position and [7,1] not in all_pieces_position:
                                     vision.append([7,1])
 
         else:
@@ -73,11 +66,8 @@ class King:
                     if piece.piece_type=='r':
                         if piece.first_move==1:
                             if board.is_checked()!='b':
-                                white_pieces_vision=[]
                                 all_pieces_position = board.get_one_color_position('b')+board.get_one_color_position('w')
-                                for piece in board.pieces['w']:
-                                    white_pieces_vision+=piece.vision(board)
-                                if [4,8] not in white_pieces_vision and [2,8] not in all_pieces_position and [3,8] not in all_pieces_position and [4,8] not in all_pieces_position:
+                                if [2,8] not in all_pieces_position and [3,8] not in all_pieces_position and [4,8] not in all_pieces_position:
                                     vision.append([3,8])
 
                 #right castling
@@ -86,10 +76,7 @@ class King:
                     if piece.piece_type=='r':
                         if piece.first_move==1:
                             if board.is_checked()!='b':
-                                white_pieces_vision=[]
                                 all_pieces_position = board.get_one_color_position('b')+board.get_one_color_position('w')
-                                for piece in board.pieces['w']:
-                                    white_pieces_vision+=piece.vision(board)
-                                if [6,8] not in black_pieces_vision and [6,8] not in all_pieces_position and [7,8] not in all_pieces_position:
+                                if [6,8] not in all_pieces_position and [7,8] not in all_pieces_position:
                                     vision.append([7,8])
         return vision

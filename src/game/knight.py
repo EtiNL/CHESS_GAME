@@ -1,5 +1,4 @@
 import itertools
-from ..board.board import Board
 
 class Knight:
     def __init__(self,color,file,row):

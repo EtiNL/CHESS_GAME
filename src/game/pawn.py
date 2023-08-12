@@ -1,4 +1,4 @@
-from ..board.board import Board
+
 
 class Pawn:
     def __init__(self,color,file,row):

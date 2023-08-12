@@ -1,9 +1,9 @@
-from ..pieces.pawn import Pawn
-from ..pieces.king import King
-from ..pieces.queen import Queen
-from ..pieces.bishop import Bishop
-from ..pieces.knight import Knight
-from ..pieces.rook import Rook
+from .pawn import Pawn
+from .king import King
+from .queen import Queen
+from .bishop import Bishop
+from .knight import Knight
+from .rook import Rook
 
 
 
@@ -97,9 +97,10 @@ class Board:
 
         #looking for checks
         for piece in self.pieces['b']:
-            vision = piece.vision(self)
-            if white_king_pos in vision:
-                return 'w' #returns 'w' if the white king is checked
+            if piece.piece_type!='K':
+                vision = piece.vision(self)
+                if white_king_pos in vision:
+                    return 'w' #returns 'w' if the white king is checked
 
         #getting the black king position
         for piece in self.pieces['b']:
@@ -109,9 +110,10 @@ class Board:
 
         #looking for checks
         for piece in self.pieces['w']:
-            vision = piece.vision(self)
-            if black_king_pos in vision:
-                return 'b' #returns 'b' if the black king is checked
+            if piece.piece_type!='K':
+                vision = piece.vision(self)
+                if black_king_pos in vision:
+                    return 'b' #returns 'b' if the black king is checked
 
         return 0 # if no one is checked
 
