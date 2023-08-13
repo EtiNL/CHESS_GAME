@@ -1,9 +1,6 @@
 import pygame
 from pygame.locals import *
 
-import pygame
-from pygame.locals import *
-
 class CEvent:
     def __init__(self):
         pass
@@ -25,8 +22,11 @@ class CEvent:
         pass
     def on_lbutton_up(self, event):
         pass
-    def on_lbutton_down(self, event):
-        pass
+    def on_lbutton_down(self, event, display):
+        pos=pygame.mouse.get_pos()
+        print(pos[0],pos[1])
+        red = (255,0,0)
+        pygame.draw.rect(display, red, pygame.Rect(100, 30, 60, 60))
     def on_rbutton_up(self, event):
         pass
     def on_rbutton_down(self, event):
@@ -43,8 +43,6 @@ class CEvent:
         pass
     def on_expose(self):
         pass
-    def on_exit(self):
-        pygame.quit()
     def on_user(self,event):
         pass
     def on_joy_axis(self,event):
@@ -57,7 +55,7 @@ class CEvent:
         pass
     def on_joy_ball(self,event):
         pass
-    def on_event(self, event):
+    def on_event(self, event, display):
         if event.type == QUIT:
             self.on_exit()
 
@@ -80,19 +78,19 @@ class CEvent:
             self.on_mouse_move(event)
 
         elif event.type == MOUSEBUTTONUP:
-            if event.button == 0:
+            if event.button == 1:
                 self.on_lbutton_up(event)
-            elif event.button == 1:
-                self.on_mbutton_up(event)
             elif event.button == 2:
+                self.on_mbutton_up(event)
+            elif event.button == 3:
                 self.on_rbutton_up(event)
 
         elif event.type == MOUSEBUTTONDOWN:
-            if event.button == 0:
-                self.on_lbutton_down(event)
-            elif event.button == 1:
-                self.on_mbutton_down(event)
+            if event.button == 1:
+                self.on_lbutton_down(event, display)
             elif event.button == 2:
+                self.on_mbutton_down(event)
+            elif event.button == 3:
                 self.on_rbutton_down(event)
 
         elif event.type == ACTIVEEVENT:

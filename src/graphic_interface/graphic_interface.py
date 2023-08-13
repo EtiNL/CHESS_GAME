@@ -33,7 +33,7 @@ class App(cevent.CEvent):
 
         while( self._running ):
             for event in pygame.event.get():
-                self.on_event(event)
+                self.on_event(event,self._display_surf)
             self.on_loop()
             self.on_render()
         self.on_cleanup()
