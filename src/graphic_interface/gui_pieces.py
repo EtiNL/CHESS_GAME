@@ -19,36 +19,36 @@ class GUI_pieces(pygame.sprite.Sprite):
 
         if self.type == 'p':
             if self.color == 'b':
-                self.image = pygame.image.load("src/graphic_interface/b_pawn_png_128px.png").convert()
+                self.image = pygame.image.load("src/graphic_interface/b_pawn_png_128px.png").convert_alpha()
             elif self.color=='w':
-                self.image = pygame.image.load("src/graphic_interface/w_pawn_png_128px.png").convert()
+                self.image = pygame.image.load("src/graphic_interface/w_pawn_png_128px.png").convert_alpha()
 
         if self.type == 'K':
             if self.color == 'b':
-                self.image = pygame.image.load("src/graphic_interface/b_king_png_128px.png").convert()
+                self.image = pygame.image.load("src/graphic_interface/b_king_png_128px.png").convert_alpha()
             elif self.color=='w':
-                self.image = pygame.image.load("src/graphic_interface/w_king_png_128px.png").convert()
+                self.image = pygame.image.load("src/graphic_interface/w_king_png_128px.png").convert_alpha()
 
         if self.type == 'Q':
             if self.color == 'b':
-                self.image = pygame.image.load("src/graphic_interface/b_queen_png_128px.png").convert()
+                self.image = pygame.image.load("src/graphic_interface/b_queen_png_128px.png").convert_alpha()
             elif self.color=='w':
-                self.image = pygame.image.load("src/graphic_interface/w_queen_png_128px.png").convert()
+                self.image = pygame.image.load("src/graphic_interface/w_queen_png_128px.png").convert_alpha()
 
         if self.type == 'b':
             if self.color == 'b':
-                self.image = pygame.image.load("src/graphic_interface/b_bishop_png_128px.png").convert()
+                self.image = pygame.image.load("src/graphic_interface/b_bishop_png_128px.png").convert_alpha()
             elif self.color=='w':
-                self.image = pygame.image.load("src/graphic_interface/w_bishop_png_128px.png").convert()
+                self.image = pygame.image.load("src/graphic_interface/w_bishop_png_128px.png").convert_alpha()
 
         if self.type == 'k':
             if self.color == 'b':
-                self.image = pygame.image.load("src/graphic_interface/b_knight_png_128px.png").convert()
+                self.image = pygame.image.load("src/graphic_interface/b_knight_png_128px.png").convert_alpha()
             elif self.color=='w':
-                self.image = pygame.image.load("src/graphic_interface/w_knight_png_128px.png").convert()
+                self.image = pygame.image.load("src/graphic_interface/w_knight_png_128px.png").convert_alpha()
 
         if self.type == 'r':
             if self.color == 'b':
-                self.image = pygame.image.load("src/graphic_interface/b_rook_png_128px.png").convert()
+                self.image = pygame.image.load("src/graphic_interface/b_rook_png_128px.png").convert_alpha()
             elif self.color=='w':
-                self.image = pygame.image.load("src/graphic_interface/w_rook_png_128px.png").convert()
+                self.image = pygame.image.load("src/graphic_interface/w_rook_png_128px.png").convert_alpha()
