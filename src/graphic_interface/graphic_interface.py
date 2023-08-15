@@ -15,6 +15,8 @@ class App(cevent.CEvent,gui_pieces.GUI_pieces):
         self._display_surf = pygame.display.set_mode((1000,1000), pygame.HWSURFACE)
         pygame.display.set_caption("Chess game")
         self._running = True
+        self.moving = False
+        self.moving_piece = None
 
         'loading board image'
         self._image_surf = pygame.image.load("src/graphic_interface/Chessboard.jpeg").convert()
@@ -35,6 +37,7 @@ class App(cevent.CEvent,gui_pieces.GUI_pieces):
         self._display_surf.blit(self._image_surf,(0,0))
         for piece in self.white_pieces:
             self._display_surf.blit(piece.image,piece.image_pos)
+            pygame.draw.rect(self._display_surf, (255,0,0), piece.pos_rect, 1)
         for piece in self.black_pieces:
             self._display_surf.blit(piece.image,piece.image_pos)
         pygame.display.update()
@@ -51,7 +54,26 @@ class App(cevent.CEvent,gui_pieces.GUI_pieces):
 
         while( self._running ):
             for event in pygame.event.get():
-                self.on_event(event)
+                if event.type == QUIT:
+                    self.on_exit()
+                elif event.type == MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        for piece in self.white_pieces:
+                            if (piece.pos_rect).collidepoint(event.pos):
+                                self.moving = True
+                                self.moving_piece = piece
+                        for piece in self.black_pieces:
+                            if (piece.pos_rect).collidepoint(event.pos):
+                                self.moving = True
+                                self.moving_piece = piece
+                    if event.button ==3:
+                        print(pygame.mouse.get_pos())
+                elif event.type == MOUSEBUTTONUP:
+                    if event.button == 1:
+                        self.moving = False
+                elif event.type == MOUSEMOTION and self.moving:
+                    self.moving_piece.image_pos = tuple(map(lambda x, y: x + y, self.moving_piece.image_pos, event.rel))
+                    (self.moving_piece.pos_rect).move_ip(event.rel)
             self.on_loop()
             self.on_render()
         self.on_cleanup()
