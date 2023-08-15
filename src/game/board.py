@@ -46,11 +46,11 @@ class Board:
                 elif pos[1]=='k':
                     self.pieces[pos[0]].append(Knight(pos[0],pos[2],pos[3]))
                 elif pos[1]=='r':
-                    self.pieces[pos[0]].append(Rook(pos[0],pos[2],pos[3],pos[4]))
+                    self.pieces[pos[0]].append(Rook(pos[0],pos[2],pos[3]))
                 elif pos[1]=='Q':
                     self.pieces[pos[0]].append(Queen(pos[0],pos[2],pos[3]))
                 else:
-                    self.pieces[pos[0]].append(King(pos[0],pos[2],pos[3],pos[4]))
+                    self.pieces[pos[0]].append(King(pos[0],pos[2],pos[3]))
 
     def get_entire_position(self):
             position=[]
