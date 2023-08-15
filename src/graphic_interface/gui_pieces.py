@@ -11,11 +11,12 @@ for i in range(1,9):
         k+=1
 
 def chess_pos_to_image_pos(pos):
-    i,j = pos[0],pos[1]
-    x = np.floor(49+112.5*i+112.5/2-40)
-    y = np.floor(949-112.5*j-112.5/2-40)
-    print((x,y))
-    return (int(y),int(x))
+    j,i = pos[0],pos[1]
+    x = np.floor(49+112.5*(i-1)+112.5/2-40)
+    y = np.floor(949-112.5*(j-1)-112.5/2-40)
+    return (int(x),int(y))
+
+
 
 class GUI_pieces(pygame.sprite.Sprite):
     def __init__(self,type,color,chess_pos):

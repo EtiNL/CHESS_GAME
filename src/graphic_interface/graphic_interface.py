@@ -1,9 +1,11 @@
 import pygame
 from pygame.locals import *
+import numpy as np
 import src.graphic_interface.cevent as cevent
 import src.graphic_interface.gui_pieces as gui_pieces
 
 class App(cevent.CEvent,gui_pieces.GUI_pieces):
+    global move
     def __init__(self, pieces):
         self._running = True
         self._display_surf = None
@@ -62,21 +64,39 @@ class App(cevent.CEvent,gui_pieces.GUI_pieces):
                             if (piece.pos_rect).collidepoint(event.pos):
                                 self.moving = True
                                 self.moving_piece = piece
+                                self.start_pos = pygame.mouse.get_pos()
                         for piece in self.black_pieces:
                             if (piece.pos_rect).collidepoint(event.pos):
                                 self.moving = True
                                 self.moving_piece = piece
+                                self.start_pos = pygame.mouse.get_pos()
                     if event.button ==3:
                         print(pygame.mouse.get_pos())
                 elif event.type == MOUSEBUTTONUP:
                     if event.button == 1:
                         self.moving = False
+                        return [image_pos_to_chess_pos(self.start_pos),image_pos_to_chess_pos(pygame.mouse.get_pos())]
                 elif event.type == MOUSEMOTION and self.moving:
                     self.moving_piece.image_pos = tuple(map(lambda x, y: x + y, self.moving_piece.image_pos, event.rel))
                     (self.moving_piece.pos_rect).move_ip(event.rel)
             self.on_loop()
             self.on_render()
-        self.on_cleanup()
+
+    def get_pieces(self):
+        'loading pieces'
+        self.white_pieces=[]
+        for piece in self.pieces['w']:
+            self.white_pieces.append(gui_pieces.GUI_pieces(piece.piece_type, 'w', [piece.row,piece.file]))
+        self.black_pieces=[]
+        for piece in self.pieces['b']:
+            self.black_pieces.append(gui_pieces.GUI_pieces(piece.piece_type, 'b', [piece.row,piece.file]))
+
+def image_pos_to_chess_pos(pos):
+    x, y = pos[0],pos[1]
+    j = int(np.floor(1-(y+40+112.5/2-949)/112.5))
+    i = int(np.floor(1+(x-49-112.5/2+40)/112.5))
+    return [i,j+1]
+
 
 if __name__ == "__main__" :
     theApp = App()
