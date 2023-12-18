@@ -3,4 +3,4 @@ from setuptools import setup
 
 setup(name='game',
       description="package description",
-      packages=["src/game"]) # You can have several packages, try it
+      packages=["src/game"])
