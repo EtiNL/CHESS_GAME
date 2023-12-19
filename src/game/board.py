@@ -161,9 +161,8 @@ class Board:
                 i = position_to_test.index([piece.color,piece.piece_type,piece.file,piece.row])
                 position_to_test[i]=[piece.color,piece.piece_type,move[0],move[1]]
             Position_to_test = Board(0,position_to_test)
-            if piece.color == 'w':
-                if Position_to_test.is_checked()=='w':
-                    return 0
+            if piece.color == 'w'and Position_to_test.is_checked()=='w':
+                return 0
             else:
                 if Position_to_test.is_checked()=='b':
                     return 0
