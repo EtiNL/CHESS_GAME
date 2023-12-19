@@ -9,6 +9,7 @@ from .rook import Rook
 
 class Board:
     def __init__(self,newgame,position):
+        self.moves = []
         if newgame:
 
             #create the white pieces
@@ -33,6 +34,7 @@ class Board:
 
             self.pieces = {'w':[wAp,wBp,wCp,wDp,wEp,wFp,wGp,wHp,wwb,wbb,wk1,wk2,wr1,wr2,wQ,wK],
                            'b':[bAp,bBp,bCp,bDp,bEp,bFp,bGp,bHp,bwb,bbb,bk1,bk2,br1,br2,bQ,bK]}
+
 
         else:
             self.pieces = {'w':[],
@@ -152,11 +154,12 @@ class Board:
         else:
             position_to_test = self.get_entire_position()
 
-            for i,pos in enumerate(position_to_test):
-                if pos==[piece.color,piece.piece_type,piece.file,piece.row]:
-                    break
-
-            position_to_test[i]=[piece.color,piece.piece_type,move[0],move[1]]
+            if piece.piece_type=='K' or piece.piece_type=='r':
+                i = position_to_test.index([piece.color,piece.piece_type,piece.file,piece.row,piece.first_move])
+                position_to_test[i]=[piece.color,piece.piece_type,move[0],move[1],piece.first_move]
+            else:
+                i = position_to_test.index([piece.color,piece.piece_type,piece.file,piece.row])
+                position_to_test[i]=[piece.color,piece.piece_type,move[0],move[1]]
             Position_to_test = Board(0,position_to_test)
             if piece.color == 'w':
                 if Position_to_test.is_checked()=='w':
@@ -169,47 +172,102 @@ class Board:
             del Position_to_test
 
             # we have handled all cases of illegal moves
-            # Now we have to handle the case of capture and castling
+            # Now we have to handle the case of capture (with en passant) and castling
 
             if piece.color =='w':
                 if move in self.get_one_color_position('b'):
                     taken_piece = self.get_piece_from_position(move)
                     self.pieces['b'].remove(taken_piece)
                     taken_piece.state = 0
+                    self.moves.append(([piece.file,piece.row],move))
                     piece.move(move)
 
                     print('take')
+                # en passant
+                elif piece.piece_type == 'p' and move[0]!= piece.file:
+                    taken_piece = self.get_piece_from_position([move[0],move[1]-1])
+                    self.pieces['b'].remove(taken_piece)
+                    taken_piece.state = 0
+                    self.moves.append(([piece.file,piece.row],move))
+                    piece.move(move)
+                    print('en passant !')
+
                 else:
                     if piece.piece_type=='K' and (move[0]-piece.file<-1 or move[0]-piece.file>1):
-                            if move[0]==7: #right castling
-                                rook = self.get_piece_from_position([8,1])
-                                rook.move([6,1])
-                                piece.move(move)
-                            else: #left castling
-                                rook = self.get_piece_from_position([1,1])
-                                rook.move([4,1])
-                                piece.move(move)
+                        position_to_test = self.get_entire_position()
+
+                        i = position_to_test.index([piece.color,piece.piece_type,piece.file,piece.row,piece.first_move])
+                        if move[0]==7: #right castling
+                            position_to_test[i]=[piece.color,piece.piece_type,6,1,1]
+                            Position_to_test = Board(0,position_to_test)
+                            if Position_to_test.is_checked()=='w':
+                                Position_to_test.delete_all_pieces()
+                                del Position_to_test
+                                return 0
+                            rook = self.get_piece_from_position([8,1])
+                            rook.move([6,1])
+                            self.moves.append(([piece.file,piece.row],move))
+                            piece.move(move)
+                        else: #left castling
+                            position_to_test[i]=[piece.color,piece.piece_type,4,1,1]
+                            Position_to_test = Board(0,position_to_test)
+                            if Position_to_test.is_checked()=='w':
+                                Position_to_test.delete_all_pieces()
+                                del Position_to_test
+                                return 0
+                            rook = self.get_piece_from_position([1,1])
+                            rook.move([4,1])
+                            self.moves.append(([piece.file,piece.row],move))
+                            piece.move(move)
                     else:
+                        self.moves.append(([piece.file,piece.row],move))
                         piece.move(move)
             else:
                 if move in self.get_one_color_position('w'):
                     taken_piece = self.get_piece_from_position(move)
                     self.pieces['w'].remove(taken_piece)
                     taken_piece.state = 0
+                    self.moves.append(([piece.file,piece.row],move))
                     piece.move(move)
                     print('take')
+                elif piece.piece_type == 'p' and move[0]!= piece.file:
+                    taken_piece = self.get_piece_from_position([move[0],move[1]+1])
+                    self.pieces['w'].remove(taken_piece)
+                    taken_piece.state = 0
+                    self.moves.append(([piece.file,piece.row],move))
+                    piece.move(move)
+                    print('en passant !')
                 else:
                     if piece.piece_type=='K' and (move[0]-piece.file<-1 or move[0]-piece.file>1):
-                            if move[0]==7: #right castling
-                                rook = self.get_piece_from_position([8,8])
-                                rook.move([6,8])
-                                piece.move(move)
-                            else: #left castling
-                                rook = self.get_piece_from_position([1,8])
-                                rook.move([4,8])
-                                piece.move(move)
+                        position_to_test = self.get_entire_position()
+
+                        i = position_to_test.index([piece.color,piece.piece_type,piece.file,piece.row,piece.first_move])
+                        if move[0]==7: #right castling
+                            position_to_test[i]=[piece.color,piece.piece_type,6,8,1]
+                            Position_to_test = Board(0,position_to_test)
+                            if Position_to_test.is_checked()=='b':
+                                Position_to_test.delete_all_pieces()
+                                del Position_to_test
+                                return 0
+                            rook = self.get_piece_from_position([8,8])
+                            rook.move([6,8])
+                            self.moves.append(([piece.file,piece.row],move))
+                            piece.move(move)
+                        else: #left castling
+                            position_to_test[i]=[piece.color,piece.piece_type,4,8,1]
+                            Position_to_test = Board(0,position_to_test)
+                            if Position_to_test.is_checked()=='b':
+                                Position_to_test.delete_all_pieces()
+                                del Position_to_test
+                                return 0
+                            rook = self.get_piece_from_position([1,8])
+                            rook.move([4,8])
+                            self.moves.append(([piece.file,piece.row],move))
+                            piece.move(move)
                     else:
+                        self.moves.append(([piece.file,piece.row],move))
                         piece.move(move)
+
 
             # Then the case of promotion for now only in queen
             if piece.color =='w':
@@ -219,7 +277,7 @@ class Board:
                     piece.state = 0
 
             else:
-                if piece.piece_type=='p' and piece.row==8:
+                if piece.piece_type=='p' and piece.row==1:
                     self.pieces['b'].remove(piece)
                     self.pieces['b'].append(Queen('b',piece.file,piece.row))
                     piece.state = 0

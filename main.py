@@ -2,6 +2,8 @@ from src.game import board
 from src.graphic_interface import graphic_interface
 
 game = board.Board(1,0)
+# position_to_test = [['w', 'p', 1, 2], ['w', 'p', 2, 2], ['w', 'p', 3, 2], ['w', 'p', 4, 2], ['w', 'p', 4, 5], ['w', 'p', 6, 2], ['w', 'p', 7, 2], ['w', 'p', 8, 2], ['w', 'b', 6, 1], ['w', 'b', 3, 1], ['w', 'k', 7, 1], ['w', 'k', 2, 1], ['w', 'r', 1, 1, 1], ['w', 'r', 8, 1, 1], ['w', 'Q', 4, 1], ['w', 'K', 5, 1, 1], ['b', 'p', 1, 7], ['b', 'p', 2, 7], ['b', 'p', 3, 7], ['b', 'p', 5, 7], ['b', 'p', 6, 7], ['b', 'p', 7, 7], ['b', 'p', 8, 7], ['b', 'b', 6, 8], ['b', 'b', 3, 8], ['b', 'k', 7, 8], ['b', 'k', 2, 8], ['b', 'r', 1, 8, 1], ['b', 'r', 8, 8, 1], ['b', 'Q', 4, 8], ['b', 'K', 5, 8, 1]]
+# game = board.Board(0,position_to_test)
 "A_pawn = game.get_piece_from_position([1,2])"
 "game.move(A_pawn,[1,4])"
 gui_game = graphic_interface.App(game.pieces)

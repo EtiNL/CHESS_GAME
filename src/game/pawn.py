@@ -23,7 +23,8 @@ class Pawn:
     def move(self,move): #move = [file,row]
         self.file = move[0]
         self.row = move[1]
-        self.first_move = 0
+        if self.first_move == 1:
+            self.first_move = 0
 
     def vision(self,board):
 
@@ -54,11 +55,15 @@ class Pawn:
                 vision.append([self.file,self.row+2])
 
             #We still have to take care of en passant
-#             if self.row == 5:
-#                 piece_to_take_left = board.get_piece_from_position([self.file-1,5])
-#                 piece_to_take_right = board.get_piece_from_position([self.file+1,5])
+            if self.row == 5 and board.moves!=[]:
 
-#                 if piece_to_take_left!=0 and piece_to_take_left.color == 'b' and piece_to_take_left.piece_type == 'p' and
+                piece_to_take_left = board.get_piece_from_position([self.file-1,5])
+                piece_to_take_right = board.get_piece_from_position([self.file+1,5])
+
+                if piece_to_take_left!=0 and piece_to_take_left.color == 'b' and piece_to_take_left.piece_type == 'p' and board.moves[-1]==([self.file-1,7],[self.file-1,5]):
+                    vision.append([self.file-1,self.row+1])
+                elif piece_to_take_right!=0 and piece_to_take_right.color == 'b' and piece_to_take_right.piece_type == 'p' and board.moves[-1]==([self.file+1,7],[self.file+1,5]):
+                    vision.append([self.file+1,self.row+1])
         else:
             #the black pawn can move one down if there is no piece in front of it
             if [self.file,self.row-1] not in all_pieces_position:
@@ -75,5 +80,13 @@ class Pawn:
                 vision.append([self.file,self.row-2])
 
             #We still have to take care of en passant
+            if self.row == 4 and board.moves!=[]:
+                piece_to_take_left = board.get_piece_from_position([self.file-1,4])
+                piece_to_take_right = board.get_piece_from_position([self.file+1,4])
+
+                if piece_to_take_left!=0 and piece_to_take_left.color == 'w' and piece_to_take_left.piece_type == 'p' and board.moves[-1]==([self.file-1,2],[self.file-1,4]):
+                    vision.append([self.file-1,self.row-1])
+                elif piece_to_take_right!=0 and piece_to_take_right.color == 'w' and piece_to_take_right.piece_type == 'p' and board.moves[-1]==([self.file+1,2],[self.file+1,4]):
+                    vision.append([self.file+1,self.row-1])
 
         return vision
