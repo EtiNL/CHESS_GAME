@@ -102,6 +102,10 @@ class Board:
             if piece.piece_type!='K':
                 vision = piece.vision(self)
                 if white_king_pos in vision:
+                    # print('white is checked')
+                    # print(f'white king pos = {white_king_pos}')
+                    # print(f'black {piece.piece_type} at {[piece.file, piece.row]} is checking with vision = {vision}')
+
                     return 'w' #returns 'w' if the white king is checked
 
         #getting the black king position
@@ -115,6 +119,9 @@ class Board:
             if piece.piece_type!='K':
                 vision = piece.vision(self)
                 if black_king_pos in vision:
+                    # print('black is checked')
+                    # print(f'black king pos = {black_king_pos}')
+                    # print(f'white {piece.piece_type} at {[piece.file, piece.row]} is checking with vision = {vision}')
                     return 'b' #returns 'b' if the black king is checked
 
         return 0 # if no one is checked
@@ -160,11 +167,26 @@ class Board:
             else:
                 i = position_to_test.index([piece.color,piece.piece_type,piece.file,piece.row])
                 position_to_test[i]=[piece.color,piece.piece_type,move[0],move[1]]
+            position_to_test_taken_piece = self.get_piece_from_position(move)
+
+            if position_to_test_taken_piece != 0:
+                if position_to_test_taken_piece.piece_type == 'r':
+                    to_remove = [position_to_test_taken_piece.color,position_to_test_taken_piece.piece_type,position_to_test_taken_piece.file,position_to_test_taken_piece.row,position_to_test_taken_piece.first_move]
+                else:
+                    to_remove = [position_to_test_taken_piece.color,position_to_test_taken_piece.piece_type,position_to_test_taken_piece.file,position_to_test_taken_piece.row]
+
+                position_to_test.remove(to_remove)
+
             Position_to_test = Board(0,position_to_test)
-            if piece.color == 'w'and Position_to_test.is_checked()=='w':
-                return 0
+            if piece.color == 'w':
+                if Position_to_test.is_checked()=='w':
+                    # print('position_to_test problem')
+                    # print(position_to_test)
+                    return 0
             else:
                 if Position_to_test.is_checked()=='b':
+                    # print('position_to_test problem')
+                    # print(position_to_test)
                     return 0
 
             Position_to_test.delete_all_pieces()
@@ -245,6 +267,7 @@ class Board:
                             position_to_test[i]=[piece.color,piece.piece_type,6,8,1]
                             Position_to_test = Board(0,position_to_test)
                             if Position_to_test.is_checked()=='b':
+                                print(260)
                                 Position_to_test.delete_all_pieces()
                                 del Position_to_test
                                 return 0
