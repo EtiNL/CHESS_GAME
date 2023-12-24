@@ -5,7 +5,7 @@
 - code a me looking AI
 - code en passant :white_check_mark:
 - code draw by repetition
-- code board.result = 0 (if not finished), 'w' (if white won), 'b' (if black won), 'd' (if draw)
+- code board.result = 0 (if not finished), 'w' (if white won), 'b' (if black won), 'd' (if draw):white_check_mark:
 
 # Debbug:
 

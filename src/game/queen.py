@@ -8,7 +8,7 @@ class Queen:
         self.row = row
         self.state = 1 #alive
 
-    def move(self,move): #move = [file,row]
+    def Move(self,move): #move = [file,row]
         self.file = move[0]
         self.row = move[1]
 

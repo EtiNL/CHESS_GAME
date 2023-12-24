@@ -8,8 +8,10 @@ from .rook import Rook
 
 
 class Board:
-    def __init__(self,newgame,position):
-        self.moves = []
+    def __init__(self,newgame,position,moves=[],color_to_play='w'):
+        self.moves = moves
+        self.color_to_play = color_to_play
+        self.result = 0
         if newgame:
 
             #create the white pieces
@@ -48,11 +50,11 @@ class Board:
                 elif pos[1]=='k':
                     self.pieces[pos[0]].append(Knight(pos[0],pos[2],pos[3]))
                 elif pos[1]=='r':
-                    self.pieces[pos[0]].append(Rook(pos[0],pos[2],pos[3]))
+                    self.pieces[pos[0]].append(Rook(pos[0],pos[2],pos[3],first_move=pos[4]))
                 elif pos[1]=='Q':
                     self.pieces[pos[0]].append(Queen(pos[0],pos[2],pos[3]))
                 else:
-                    self.pieces[pos[0]].append(King(pos[0],pos[2],pos[3]))
+                    self.pieces[pos[0]].append(King(pos[0],pos[2],pos[3],first_move=pos[4]))
 
     def get_entire_position(self):
             position=[]
@@ -68,7 +70,6 @@ class Board:
                     position.append([piece.color,piece.piece_type,piece.file,piece.row,piece.first_move])
                 else:
                     position.append([piece.color,piece.piece_type,piece.file,piece.row])
-
             return position
 
     def get_one_color_position(self,color):
@@ -133,12 +134,21 @@ class Board:
             for move in piece.vision(self):
                 position_to_test = self.get_entire_position()
 
-                for i,pos in enumerate(position_to_test):
-                    if pos==[color,piece.piece_type,piece.file,piece.row]:
-                        break
+                if piece.piece_type=='K' or piece.piece_type=='r':
+                    i = position_to_test.index([piece.color,piece.piece_type,piece.file,piece.row,piece.first_move])
+                    position_to_test[i]=[piece.color,piece.piece_type,move[0],move[1],piece.first_move]
+                else:
+                    i = position_to_test.index([piece.color,piece.piece_type,piece.file,piece.row])
+                    position_to_test[i]=[piece.color,piece.piece_type,move[0],move[1]]
+                position_to_test_taken_piece = self.get_piece_from_position(move)
 
-                position_to_test[i]=[color,piece.piece_type,move[0],move[1]]
-                Position_to_test = Board(0,position_to_test)
+                if position_to_test_taken_piece != 0 and position_to_test_taken_piece.piece_type !='K':
+                    if position_to_test_taken_piece.piece_type == 'r':
+                        to_remove = [position_to_test_taken_piece.color,position_to_test_taken_piece.piece_type,position_to_test_taken_piece.file,position_to_test_taken_piece.row,position_to_test_taken_piece.first_move]
+                    else:
+                        to_remove = [position_to_test_taken_piece.color,position_to_test_taken_piece.piece_type,position_to_test_taken_piece.file,position_to_test_taken_piece.row]
+                    position_to_test.remove(to_remove)
+                Position_to_test = Board(0,position_to_test,moves=self.moves,color_to_play=color)
                 if color == 'w':
                     if Position_to_test.is_checked()!='w':
                         possible_moves.append([piece,move])
@@ -155,7 +165,7 @@ class Board:
         del self.pieces['w']
         del self.pieces['b']
 
-    def move(self,piece,move):
+    def Move(self,piece,move):
         if move not in piece.vision(self):
             return 0 #not a legal move
         else:
@@ -177,7 +187,7 @@ class Board:
 
                 position_to_test.remove(to_remove)
 
-            Position_to_test = Board(0,position_to_test)
+            Position_to_test = Board(0,position_to_test,moves=self.moves,color_to_play=self.color_to_play)
             if piece.color == 'w':
                 if Position_to_test.is_checked()=='w':
                     # print('position_to_test problem')
@@ -201,7 +211,9 @@ class Board:
                     self.pieces['b'].remove(taken_piece)
                     taken_piece.state = 0
                     self.moves.append(([piece.file,piece.row],move))
-                    piece.move(move)
+                    piece.Move(move)
+                    self.color_to_play = self.inverse_color(self.color_to_play)
+                    self.game_end()
 
                     print('take')
                 # en passant
@@ -210,7 +222,9 @@ class Board:
                     self.pieces['b'].remove(taken_piece)
                     taken_piece.state = 0
                     self.moves.append(([piece.file,piece.row],move))
-                    piece.move(move)
+                    piece.Move(move)
+                    self.color_to_play = self.inverse_color(self.color_to_play)
+                    self.game_end()
                     print('en passant !')
 
                 else:
@@ -220,43 +234,53 @@ class Board:
                         i = position_to_test.index([piece.color,piece.piece_type,piece.file,piece.row,piece.first_move])
                         if move[0]==7: #right castling
                             position_to_test[i]=[piece.color,piece.piece_type,6,1,1]
-                            Position_to_test = Board(0,position_to_test)
+                            Position_to_test = Board(0,position_to_test,moves=self.moves,color_to_play=self.color_to_play)
                             if Position_to_test.is_checked()=='w':
                                 Position_to_test.delete_all_pieces()
                                 del Position_to_test
                                 return 0
                             rook = self.get_piece_from_position([8,1])
-                            rook.move([6,1])
+                            rook.Move([6,1])
                             self.moves.append(([piece.file,piece.row],move))
-                            piece.move(move)
+                            piece.Move(move)
+                            self.color_to_play = self.inverse_color(self.color_to_play)
+                            self.game_end()
                         else: #left castling
                             position_to_test[i]=[piece.color,piece.piece_type,4,1,1]
-                            Position_to_test = Board(0,position_to_test)
+                            Position_to_test = Board(0,position_to_test,moves=self.moves,color_to_play=self.color_to_play)
                             if Position_to_test.is_checked()=='w':
                                 Position_to_test.delete_all_pieces()
                                 del Position_to_test
                                 return 0
                             rook = self.get_piece_from_position([1,1])
-                            rook.move([4,1])
+                            rook.Move([4,1])
                             self.moves.append(([piece.file,piece.row],move))
-                            piece.move(move)
+                            piece.Move(move)
+                            self.color_to_play = self.inverse_color(self.color_to_play)
+                            self.game_end()
                     else:
                         self.moves.append(([piece.file,piece.row],move))
-                        piece.move(move)
+                        piece.Move(move)
+                        self.color_to_play = self.inverse_color(self.color_to_play)
+                        self.game_end()
             else:
                 if move in self.get_one_color_position('w'):
                     taken_piece = self.get_piece_from_position(move)
                     self.pieces['w'].remove(taken_piece)
                     taken_piece.state = 0
                     self.moves.append(([piece.file,piece.row],move))
-                    piece.move(move)
+                    piece.Move(move)
+                    self.color_to_play = self.inverse_color(self.color_to_play)
+                    self.game_end()
                     print('take')
                 elif piece.piece_type == 'p' and move[0]!= piece.file:
                     taken_piece = self.get_piece_from_position([move[0],move[1]+1])
                     self.pieces['w'].remove(taken_piece)
                     taken_piece.state = 0
                     self.moves.append(([piece.file,piece.row],move))
-                    piece.move(move)
+                    piece.Move(move)
+                    self.color_to_play = self.inverse_color(self.color_to_play)
+                    self.game_end()
                     print('en passant !')
                 else:
                     if piece.piece_type=='K' and (move[0]-piece.file<-1 or move[0]-piece.file>1):
@@ -265,31 +289,35 @@ class Board:
                         i = position_to_test.index([piece.color,piece.piece_type,piece.file,piece.row,piece.first_move])
                         if move[0]==7: #right castling
                             position_to_test[i]=[piece.color,piece.piece_type,6,8,1]
-                            Position_to_test = Board(0,position_to_test)
+                            Position_to_test = Board(0,position_to_test,moves=self.moves,color_to_play=self.color_to_play)
                             if Position_to_test.is_checked()=='b':
-                                print(260)
                                 Position_to_test.delete_all_pieces()
                                 del Position_to_test
                                 return 0
                             rook = self.get_piece_from_position([8,8])
-                            rook.move([6,8])
+                            rook.Move([6,8])
                             self.moves.append(([piece.file,piece.row],move))
-                            piece.move(move)
+                            piece.Move(move)
+                            self.color_to_play = self.inverse_color(self.color_to_play)
+                            self.game_end()
                         else: #left castling
                             position_to_test[i]=[piece.color,piece.piece_type,4,8,1]
-                            Position_to_test = Board(0,position_to_test)
+                            Position_to_test = Board(0,position_to_test,moves=self.moves,color_to_play=self.color_to_play)
                             if Position_to_test.is_checked()=='b':
                                 Position_to_test.delete_all_pieces()
                                 del Position_to_test
                                 return 0
                             rook = self.get_piece_from_position([1,8])
-                            rook.move([4,8])
+                            rook.Move([4,8])
                             self.moves.append(([piece.file,piece.row],move))
-                            piece.move(move)
+                            piece.Move(move)
+                            self.color_to_play = self.inverse_color(self.color_to_play)
+                            self.game_end()
                     else:
                         self.moves.append(([piece.file,piece.row],move))
-                        piece.move(move)
-
+                        piece.Move(move)
+                        self.color_to_play = self.inverse_color(self.color_to_play)
+                        self.game_end()
 
             # Then the case of promotion for now only in queen
             if piece.color =='w':
@@ -303,3 +331,17 @@ class Board:
                     self.pieces['b'].remove(piece)
                     self.pieces['b'].append(Queen('b',piece.file,piece.row))
                     piece.state = 0
+
+    def game_end(self):
+        if len(self.possible_moves(self.inverse_color(self.color_to_play)))==0:
+                            if len(self.possible_moves(self.color_to_play))==0:
+                                self.result = 'd'
+                            else:
+                                self.result = self.color_to_play
+
+    @staticmethod
+    def inverse_color(color):
+        if color == 'w':
+            return 'b'
+        else:
+            return 'w'

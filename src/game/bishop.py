@@ -9,7 +9,7 @@ class Bishop:
         self.state = 1
 
 
-    def move(self,move): #move = [file,row]
+    def Move(self,move): #move = [file,row]
         self.file = move[0]
         self.row = move[1]
 

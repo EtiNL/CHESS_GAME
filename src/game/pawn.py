@@ -20,7 +20,7 @@ class Pawn:
                 self.first_move = 1 # 1 if the pawn hasn't moved yet and 0 if it has
 
 
-    def move(self,move): #move = [file,row]
+    def Move(self,move): #move = [file,row]
         self.file = move[0]
         self.row = move[1]
         if self.first_move == 1:

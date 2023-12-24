@@ -10,7 +10,7 @@ class King:
         self.first_move = first_move
 
 
-    def move(self,move):
+    def Move(self,move):
         self.file=move[0]
         self.row=move[1]
         if self.first_move == 1:
