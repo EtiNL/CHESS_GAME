@@ -91,6 +91,7 @@ class Board:
         return 0 #if no piece found in this position it returns 0
 
     def is_checked(self):
+        """ returns 'w' if white is checked, 'b' if 'black' is checked and 0 otherwise """
 
         #getting the white king position
         for piece in self.pieces['w']:
@@ -215,7 +216,7 @@ class Board:
                     self.color_to_play = self.inverse_color(self.color_to_play)
                     self.game_end()
 
-                    print('take')
+                    # print('take')
                 # en passant
                 elif piece.piece_type == 'p' and move[0]!= piece.file:
                     taken_piece = self.get_piece_from_position([move[0],move[1]-1])
@@ -225,7 +226,7 @@ class Board:
                     piece.Move(move)
                     self.color_to_play = self.inverse_color(self.color_to_play)
                     self.game_end()
-                    print('en passant !')
+                    # print('en passant !')
 
                 else:
                     if piece.piece_type=='K' and (move[0]-piece.file<-1 or move[0]-piece.file>1):
@@ -272,7 +273,7 @@ class Board:
                     piece.Move(move)
                     self.color_to_play = self.inverse_color(self.color_to_play)
                     self.game_end()
-                    print('take')
+                    # print('take')
                 elif piece.piece_type == 'p' and move[0]!= piece.file:
                     taken_piece = self.get_piece_from_position([move[0],move[1]+1])
                     self.pieces['w'].remove(taken_piece)
@@ -281,7 +282,7 @@ class Board:
                     piece.Move(move)
                     self.color_to_play = self.inverse_color(self.color_to_play)
                     self.game_end()
-                    print('en passant !')
+                    # print('en passant !')
                 else:
                     if piece.piece_type=='K' and (move[0]-piece.file<-1 or move[0]-piece.file>1):
                         position_to_test = self.get_entire_position()

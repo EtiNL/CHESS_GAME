@@ -1,11 +1,12 @@
 # Todo:
 
 - get a way to choose promotion (another window or comand line)
-- code a best player AI
+- code a best AI player
+- code an AI player :white_check_mark:
 - code a me looking AI
 - code en passant :white_check_mark:
 - code draw by repetition
-- code board.result = 0 (if not finished), 'w' (if white won), 'b' (if black won), 'd' (if draw):white_check_mark:
+- code board.result = 0 (if not finished), 'w' (if white won), 'b' (if black won), 'd' (if draw)
 
 # Debbug:
 
