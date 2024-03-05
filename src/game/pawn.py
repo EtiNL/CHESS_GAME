@@ -6,7 +6,6 @@ class Pawn:
         self.piece_type='p'
         self.file = file
         self.row = row
-        self.state = 1 #alive
         # coding first move
         if self.color == 'w':
             if self.row!=2:
@@ -30,8 +29,6 @@ class Pawn:
 
         vision=[] #list of moves for the pown given the board (= {'w':['w' pieces],'b':['b' pieces]} ) wether or not if the
                   #piece is pinned by the king
-        if self.state == 0:
-            return []
 
         white_position = board.get_one_color_position('w')
         black_position = board.get_one_color_position('b')

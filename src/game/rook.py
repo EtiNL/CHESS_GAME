@@ -5,7 +5,6 @@ class Rook:
         self.piece_type='r'
         self.file = file
         self.row = row
-        self.state = 1
         self.first_move = first_move # 1 if the rook  hasn't moved yet and 0 if it has
 
     def Move(self,move): #move = [file,row]
@@ -16,8 +15,6 @@ class Rook:
 
     def vision(self,board):
         vision=[]
-        if self.state == 0:
-            return []
 
         white_position = board.get_one_color_position('w')
         black_position = board.get_one_color_position('b')

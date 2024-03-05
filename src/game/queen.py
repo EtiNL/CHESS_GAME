@@ -6,7 +6,6 @@ class Queen:
         self.piece_type='Q'
         self.file = file
         self.row = row
-        self.state = 1 #alive
 
     def Move(self,move): #move = [file,row]
         self.file = move[0]
@@ -14,8 +13,6 @@ class Queen:
 
     def vision(self,board):
         vision=[]
-        if self.state == 0:
-            return []
 
         white_position = board.get_one_color_position('w')
         black_position = board.get_one_color_position('b')

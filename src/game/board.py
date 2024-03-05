@@ -104,9 +104,6 @@ class Board:
             if piece.piece_type!='K':
                 vision = piece.vision(self)
                 if white_king_pos in vision:
-                    # print('white is checked')
-                    # print(f'white king pos = {white_king_pos}')
-                    # print(f'black {piece.piece_type} at {[piece.file, piece.row]} is checking with vision = {vision}')
 
                     return 'w' #returns 'w' if the white king is checked
 
@@ -121,9 +118,6 @@ class Board:
             if piece.piece_type!='K':
                 vision = piece.vision(self)
                 if black_king_pos in vision:
-                    # print('black is checked')
-                    # print(f'black king pos = {black_king_pos}')
-                    # print(f'white {piece.piece_type} at {[piece.file, piece.row]} is checking with vision = {vision}')
                     return 'b' #returns 'b' if the black king is checked
 
         return 0 # if no one is checked
@@ -163,8 +157,7 @@ class Board:
         return possible_moves
 
     def delete_all_pieces(self):
-        del self.pieces['w']
-        del self.pieces['b']
+        del self.pieces
 
     def Move(self,piece,move):
         if move not in piece.vision(self):
@@ -178,6 +171,7 @@ class Board:
             else:
                 i = position_to_test.index([piece.color,piece.piece_type,piece.file,piece.row])
                 position_to_test[i]=[piece.color,piece.piece_type,move[0],move[1]]
+
             position_to_test_taken_piece = self.get_piece_from_position(move)
 
             if position_to_test_taken_piece != 0:
@@ -191,13 +185,9 @@ class Board:
             Position_to_test = Board(0,position_to_test,moves=self.moves,color_to_play=self.color_to_play)
             if piece.color == 'w':
                 if Position_to_test.is_checked()=='w':
-                    # print('position_to_test problem')
-                    # print(position_to_test)
                     return 0
             else:
                 if Position_to_test.is_checked()=='b':
-                    # print('position_to_test problem')
-                    # print(position_to_test)
                     return 0
 
             Position_to_test.delete_all_pieces()
@@ -210,7 +200,7 @@ class Board:
                 if move in self.get_one_color_position('b'):
                     taken_piece = self.get_piece_from_position(move)
                     self.pieces['b'].remove(taken_piece)
-                    taken_piece.state = 0
+                    del taken_piece
                     self.moves.append(([piece.file,piece.row],move))
                     piece.Move(move)
                     self.color_to_play = self.inverse_color(self.color_to_play)
@@ -221,7 +211,7 @@ class Board:
                 elif piece.piece_type == 'p' and move[0]!= piece.file:
                     taken_piece = self.get_piece_from_position([move[0],move[1]-1])
                     self.pieces['b'].remove(taken_piece)
-                    taken_piece.state = 0
+                    del taken_piece
                     self.moves.append(([piece.file,piece.row],move))
                     piece.Move(move)
                     self.color_to_play = self.inverse_color(self.color_to_play)
@@ -229,7 +219,8 @@ class Board:
                     # print('en passant !')
 
                 else:
-                    if piece.piece_type=='K' and (move[0]-piece.file<-1 or move[0]-piece.file>1):
+                    if piece.piece_type=='K' and abs(move[0]-piece.file)>1:
+                        #castling
                         position_to_test = self.get_entire_position()
 
                         i = position_to_test.index([piece.color,piece.piece_type,piece.file,piece.row,piece.first_move])
@@ -268,7 +259,7 @@ class Board:
                 if move in self.get_one_color_position('w'):
                     taken_piece = self.get_piece_from_position(move)
                     self.pieces['w'].remove(taken_piece)
-                    taken_piece.state = 0
+                    del taken_piece
                     self.moves.append(([piece.file,piece.row],move))
                     piece.Move(move)
                     self.color_to_play = self.inverse_color(self.color_to_play)
@@ -277,7 +268,7 @@ class Board:
                 elif piece.piece_type == 'p' and move[0]!= piece.file:
                     taken_piece = self.get_piece_from_position([move[0],move[1]+1])
                     self.pieces['w'].remove(taken_piece)
-                    taken_piece.state = 0
+                    del taken_piece
                     self.moves.append(([piece.file,piece.row],move))
                     piece.Move(move)
                     self.color_to_play = self.inverse_color(self.color_to_play)
@@ -325,13 +316,13 @@ class Board:
                 if piece.piece_type=='p' and piece.row==8:
                     self.pieces['w'].remove(piece)
                     self.pieces['w'].append(Queen('w',piece.file,piece.row))
-                    piece.state = 0
+                    del piece
 
             else:
                 if piece.piece_type=='p' and piece.row==1:
                     self.pieces['b'].remove(piece)
                     self.pieces['b'].append(Queen('b',piece.file,piece.row))
-                    piece.state = 0
+                    del piece
 
     def game_end(self):
         if len(self.possible_moves(self.inverse_color(self.color_to_play)))==0:

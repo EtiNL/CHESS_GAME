@@ -21,6 +21,7 @@ class Node:
         leaves = []
         get_leaves(self,leaves)
         return leaves
+    # def delete_branch(self,leaf):
 
 
 

@@ -6,7 +6,6 @@ class Knight:
         self.piece_type='k'
         self.file = file
         self.row = row
-        self.state = 1
 
     def Move(self,move): #move = [file,row]
         self.file = move[0]
@@ -14,8 +13,6 @@ class Knight:
 
     def vision(self,board):
         vision=[]
-        if self.state == 0:
-            return []
 
         white_position = board.get_one_color_position('w')
         black_position = board.get_one_color_position('b')

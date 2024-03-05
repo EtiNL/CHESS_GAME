@@ -6,7 +6,6 @@ class Bishop:
         self.piece_type='b'
         self.file = file
         self.row = row
-        self.state = 1
 
 
     def Move(self,move): #move = [file,row]
@@ -15,8 +14,6 @@ class Bishop:
 
     def vision(self,board):
         vision=[]
-        if self.state == 0:
-            return []
         white_position = board.get_one_color_position('w')
         black_position = board.get_one_color_position('b')
 
