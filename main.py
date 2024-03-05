@@ -10,7 +10,7 @@ gui_game = graphic_interface.App(game.pieces)
 
 color_to_play = 'w'
 
-while len(game.possible_moves(color_to_play))!=0:
+while game.result==0:
     move = gui_game.on_execute(color_to_play)
     start_pos, fin_pos = move[0],move[1]
     print(start_pos,fin_pos)
@@ -46,7 +46,7 @@ if game.result == 'w':
     print('white wins')
 elif game.result == 'b':
     print('black wins')
-else:
+elif game.result == 'd':
     print('draw')
 
 gui_game.on_cleanup()

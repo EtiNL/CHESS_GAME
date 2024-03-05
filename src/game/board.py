@@ -317,17 +317,19 @@ class Board:
                     self.pieces['w'].remove(piece)
                     self.pieces['w'].append(Queen('w',piece.file,piece.row))
                     del piece
+                    self.game_end()
 
             else:
                 if piece.piece_type=='p' and piece.row==1:
                     self.pieces['b'].remove(piece)
                     self.pieces['b'].append(Queen('b',piece.file,piece.row))
                     del piece
+                    self.game_end()
 
     def game_end(self):
-        if len(self.possible_moves(self.inverse_color(self.color_to_play)))==0:
-                            if self.is_checked() == self.inverse_color(self.color_to_play):
-                                self.result = self.color_to_play
+        if len(self.possible_moves(self.color_to_play))==0:
+                            if self.is_checked() == self.color_to_play:
+                                self.result = self.inverse_color(self.color_to_play)
                             else:
                                 self.result = 'd'
 
