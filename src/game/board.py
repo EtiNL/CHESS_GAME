@@ -326,10 +326,10 @@ class Board:
 
     def game_end(self):
         if len(self.possible_moves(self.inverse_color(self.color_to_play)))==0:
-                            if len(self.possible_moves(self.color_to_play))==0:
-                                self.result = 'd'
-                            else:
+                            if self.is_checked() == self.inverse_color(self.color_to_play):
                                 self.result = self.color_to_play
+                            else:
+                                self.result = 'd'
 
     @staticmethod
     def inverse_color(color):
