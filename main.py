@@ -13,7 +13,6 @@ color_to_play = 'w'
 while game.result==0:
     move = gui_game.on_execute(color_to_play)
     start_pos, fin_pos = move[0],move[1]
-    print(start_pos,fin_pos)
     piece = game.get_piece_from_position([start_pos[0],start_pos[1]])
 
     if piece==0:
