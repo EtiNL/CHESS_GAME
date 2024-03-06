@@ -42,7 +42,7 @@ def evaluate_pos_simplest(board):
             score -= piece_value[piece.piece_type]
         return score
 
-class Player_1:
+class Player_Min_Max:
     def __init__(self,color,board,depth):
         self.color = color
         self.board = board
