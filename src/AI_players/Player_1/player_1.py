@@ -10,16 +10,16 @@ class Node:
         if parent != None:
             parent.children.append(self)
 
-    def leaves(self):
-
-        def get_leaves(node,leaves):
+    def get_leaves(self, node,leaves):
             if node.children == []:
                 leaves.append(node)
             else:
                 for children in node.children:
-                    get_leaves(children,leaves)
+                    self.get_leaves(children,leaves)
+
+    def leaves(self):
         leaves = []
-        get_leaves(self,leaves)
+        self.get_leaves(self,leaves)
         return leaves
     # def delete_branch(self,leaf):
 
