@@ -87,6 +87,7 @@ class Tree:
             leaves = []
             for node_leaf in self.leaves:
                 board = node_leaf.board
+                move_best_score, boards_best_score = [], []
                 if board.color_to_play=='w':
                     best_score = float('-inf')
                 else:
