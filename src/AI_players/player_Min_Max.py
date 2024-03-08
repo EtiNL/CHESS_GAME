@@ -1,5 +1,7 @@
 from src.game.board import Board
 import numpy as np
+import matplotlib.pyplot as plt
+import networkx as nx
 
 class Node:
     def __init__(self, score, move, board):
@@ -21,6 +23,65 @@ def get_leaves(node, leaves=None):
             get_leaves(child, leaves)
 
     return leaves
+
+def get_depth(node):
+    if len(node.children) == 0:
+        return 1
+    return 1 + get_depth(node.children[0])
+
+file_to_letter = {1:'A', 2:'B', 3:'C', 4:'D', 5:'E', 6:'F', 7:'G', 8:'H'}
+
+def chess_notation(node, depth):
+    if node.move == []:
+        return str(node.score)
+    board = node.board
+    pos, move = node.move[0], node.move[1]
+    piece_type =  board.get_piece_from_position(move).piece_type
+    move_chess = file_to_letter[pos[0]]+str(pos[1])+file_to_letter[move[0]]+str(move[1])
+    return f'{depth}.{piece_type+move_chess}: {node.score}'
+
+
+#function to recursively create a graph from a tree
+def add_nodes_edges(graph, node, depth):
+    for child in node.children:
+        graph.add_node(chess_notation(child,depth))
+        graph.add_edge(chess_notation(node, depth-1), chess_notation(child,depth))
+        add_nodes_edges(graph, child, depth+1)
+#function to visualize the tree
+def visualize_tree(root):
+    graph = nx.Graph()
+    graph.add_node(chess_notation(root,0))
+    add_nodes_edges(graph, root, 1)
+
+    # Manually assign positions based on depth
+    depth_counts = {}
+    for node in graph.nodes():
+        depth = int(node.split('.')[0])
+        if depth not in depth_counts:
+            depth_counts[depth] = 0
+        depth_counts[depth] += 1
+    pos = {}
+    for node in graph.nodes():
+        depth = int(node.split('.')[0])
+        node_index = list(graph.nodes()).index(node) % depth_counts[depth]
+        pos[node] = (depth * 200, node_index * 100)
+
+    plt.figure(figsize=(15, 10))
+
+    # Draw nodes
+    nx.draw_networkx_nodes(graph, pos, node_size=700)
+
+    # Draw edges
+    nx.draw_networkx_edges(graph, pos, edge_color='lightblue')
+
+    # Draw labels
+    labels = {node: node[2:] for node in graph.nodes()}
+    nx.draw_networkx_labels(graph, pos, labels)
+
+    plt.show()
+
+
+
 
 class Tree:
     def __init__(self, score, move, board, eval_func):
@@ -53,6 +114,10 @@ class Tree:
                 piece_pos_to_test = Position_to_test.get_piece_from_position([piece.file, piece.row])
                 Position_to_test.Move(piece_pos_to_test,move)
                 score_pos_test = self.eval_func(Position_to_test)
+
+                # node = Node(score_pos_test, [[piece.file, piece.row],move], Position_to_test)
+                # self.leaves.append(node)
+                # self.add_node(self.root, node)
 
                 if board.color_to_play == 'w':
                     if score_pos_test > best_score:
@@ -98,6 +163,10 @@ class Tree:
                     piece_pos_to_test = Position_to_test.get_piece_from_position([piece.file, piece.row])
                     Position_to_test.Move(piece_pos_to_test,move)
                     score_pos_test = self.eval_func(Position_to_test)
+
+                    # node = Node(score_pos_test, [[piece.file, piece.row],move], Position_to_test)
+                    # self.leaves.append(node)
+                    # self.add_node(self.root, node)
 
                     if board.color_to_play == 'w':
                         if score_pos_test > best_score:
@@ -172,6 +241,7 @@ class Player_Min_Max:
         self.tree = Tree(0, [], board, eval_func)
         self.tree.grow_leaves(depth)
 
+
     def Update_tree_on_opponent_move(self, move): #[[file_start, row_start], [file_end, row_end]]
 
         move_in_tree = False
@@ -184,6 +254,7 @@ class Player_Min_Max:
         if not move_in_tree:
             self.tree = Tree(0, [], self.board, self.eval_func)
             self.tree.grow_leaves(self.depth)
+        visualize_tree(self.tree.root)
 
     def self_move(self):
         best_score = min_max(self.tree.root, self.depth, self.color=='w')
@@ -193,6 +264,9 @@ class Player_Min_Max:
         for child in self.tree.root.children:
             leaves_child = get_leaves(child)
             for leaf in leaves_child:
+                # print(f'move: {child.move}, move_score: {child.score}')
+                # print(f'leaf_move: {leaf.move}, leafscore: {leaf.score}')
+                # print(' ')
                 if leaf.score == best_score:
                     moves.append(child.move)
                     nodes_moves.append(child)
