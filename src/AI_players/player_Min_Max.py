@@ -2,6 +2,7 @@ from src.game.board import Board
 import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
+from multiprocessing import Pool
 
 class Node:
     def __init__(self, score, move, board):
@@ -92,111 +93,59 @@ class Tree:
     def add_node(self, parent_node, node):
         parent_node.add_child(node)
 
-    def trim_from_node(self,node):
+    def trim_from_node(self, node):
         self.root = node
         self.leaves = get_leaves(node)
-        assert self.leaves !=None
+        assert self.leaves != None
 
+    def grow_leaves_helper(self, args):
+        node = args[0]
+        board = node.board
+        leaves = []
+        if board.color_to_play == 'w':
+            best_score = float('-inf')
+        else:
+            best_score = float('inf')
+        for piece, move in board.possible_moves(board.color_to_play):
+            position_to_test = board.get_entire_position()
+            Position_to_test = Board(0, position_to_test, moves=[], color_to_play=board.color_to_play)
+            piece_pos_to_test = Position_to_test.get_piece_from_position([piece.file, piece.row])
+            Position_to_test.Move(piece_pos_to_test, move)
+            score_pos_test = self.eval_func(Position_to_test)
+            leaves.append((score_pos_test,[[piece.file,piece.row],move],Position_to_test.get_entire_position()))
+        return leaves
 
     def grow_leaves(self, depth):
         if depth == 0:
             return None
 
         if self.leaves == []:
-            board = self.root.board
-            if board.color_to_play=='w':
-                best_score = float('-inf')
-            else:
-                best_score = float('inf')
-            for piece,move in board.possible_moves(board.color_to_play):
-                position_to_test = board.get_entire_position()
-                Position_to_test = Board(0,position_to_test,moves=[],color_to_play=board.color_to_play)
-                piece_pos_to_test = Position_to_test.get_piece_from_position([piece.file, piece.row])
-                Position_to_test.Move(piece_pos_to_test,move)
-                score_pos_test = self.eval_func(Position_to_test)
-
-                # node = Node(score_pos_test, [[piece.file, piece.row],move], Position_to_test)
-                # self.leaves.append(node)
-                # self.add_node(self.root, node)
-
-                if board.color_to_play == 'w':
-                    if score_pos_test > best_score:
-                        best_score = score_pos_test
-                        boards_best_score = [Position_to_test]
-                        move_best_score = [[[piece.file, piece.row], move]]
-                    elif score_pos_test == best_score:
-                        boards_best_score.append(Position_to_test)
-                        move_best_score.append([[piece.file, piece.row], move])
-                    else:
-                        Position_to_test.delete_all_pieces()
-                        del Position_to_test
-                else:
-                    if score_pos_test < best_score:
-                        best_score = score_pos_test
-                        best_score = score_pos_test
-                        boards_best_score = [Position_to_test]
-                        move_best_score = [[[piece.file, piece.row], move]]
-                    elif score_pos_test == best_score:
-                        boards_best_score.append(Position_to_test)
-                        move_best_score.append([[piece.file, piece.row], move])
-                    else:
-                        Position_to_test.delete_all_pieces()
-                        del Position_to_test
-            for move, board in zip(move_best_score, boards_best_score):
-                node = Node(best_score, move, board)
-                self.leaves.append(node)
-                self.add_node(self.root, node)
-            self.grow_leaves(depth-1)
-
+            color_to_play = 'w' if self.root.board.color_to_play == 'b' else 'b'
+            args = [(self.root,)]
+            with Pool() as p:
+                result_leaves = p.map(self.grow_leaves_helper, args)
+            next_leaves = []
+            for i,leaves in enumerate(result_leaves):
+                for leaf in leaves:
+                    score, move, pos = leaf
+                    leaf = Node(score,move,Board(0, pos, moves=[], color_to_play=color_to_play))
+                    self.add_node(self.root, leaf)
+                    next_leaves.append(leaf)
+            self.leaves = next_leaves
         else:
-            leaves = []
-            for node_leaf in self.leaves:
-                board = node_leaf.board
-                move_best_score, boards_best_score = [], []
-                if board.color_to_play=='w':
-                    best_score = float('-inf')
-                else:
-                    best_score = float('inf')
-                for piece,move in board.possible_moves(board.color_to_play):
-                    position_to_test = board.get_entire_position()
-                    Position_to_test = Board(0,position_to_test,moves=[],color_to_play=board.color_to_play)
-                    piece_pos_to_test = Position_to_test.get_piece_from_position([piece.file, piece.row])
-                    Position_to_test.Move(piece_pos_to_test,move)
-                    score_pos_test = self.eval_func(Position_to_test)
-
-                    # node = Node(score_pos_test, [[piece.file, piece.row],move], Position_to_test)
-                    # self.leaves.append(node)
-                    # self.add_node(self.root, node)
-
-                    if board.color_to_play == 'w':
-                        if score_pos_test > best_score:
-                            best_score = score_pos_test
-                            boards_best_score = [Position_to_test]
-                            move_best_score = [[[piece.file,piece.row],move]]
-                        elif score_pos_test == best_score:
-                            boards_best_score.append(Position_to_test)
-                            move_best_score.append([[piece.file,piece.row],move])
-                        else:
-                            Position_to_test.delete_all_pieces()
-                            del Position_to_test
-                    else:
-                        if score_pos_test < best_score:
-                            best_score = score_pos_test
-                            best_score = score_pos_test
-                            boards_best_score = [Position_to_test]
-                            move_best_score = [[[piece.file,piece.row],move]]
-                        elif score_pos_test == best_score:
-                            boards_best_score.append(Position_to_test)
-                            move_best_score.append([[piece.file,piece.row],move])
-                        else:
-                            Position_to_test.delete_all_pieces()
-                            del Position_to_test
-                for move, board in zip(move_best_score, boards_best_score):
-                    node = Node(best_score, move, board)
-                    leaves.append(node)
-                    self.add_node(node_leaf, node)
-            self.leaves = leaves
-            self.grow_leaves(depth-1)
+            color_to_play = 'w' if (self.leaves[0]).board.color_to_play == 'b' else 'b'
+            args = [(node,) for node in self.leaves]
+            with Pool() as p:
+                result_leaves = p.map(self.grow_leaves_helper, args)
+            next_leaves = []
+            for i,leaves in enumerate(result_leaves):
+                for leaf in leaves:
+                    score, move, pos = leaf
+                    leaf = Node(score,move,Board(0, pos, moves=[], color_to_play=color_to_play))
+                    self.add_node(self.leaves[i], leaf)
+                    next_leaves.append(leaf)
+            self.leaves = next_leaves
+        self.grow_leaves(depth - 1)
 
 def min_max(node, depth, maximizing_player):
     if depth == 0 or len(node.children)==0:
@@ -254,26 +203,28 @@ class Player_Min_Max:
         if not move_in_tree:
             self.tree = Tree(0, [], self.board, self.eval_func)
             self.tree.grow_leaves(self.depth)
-        visualize_tree(self.tree.root)
+        # visualize_tree(self.tree.root)
+
+    def evaluate_move(self, node):
+        return min_max(node, self.depth, self.color == 'w')
 
     def self_move(self):
-        best_score = min_max(self.tree.root, self.depth, self.color=='w')
         moves = []
         nodes_moves = []
-        print(best_score)
-        for child in self.tree.root.children:
-            leaves_child = get_leaves(child)
-            for leaf in leaves_child:
-                # print(f'move: {child.move}, move_score: {child.score}')
-                # print(f'leaf_move: {leaf.move}, leafscore: {leaf.score}')
-                # print(' ')
-                if leaf.score == best_score:
-                    moves.append(child.move)
-                    nodes_moves.append(child)
-        assert len(moves)!=0
+
+        with Pool() as p:
+            scores = p.map(self.evaluate_move, self.tree.root.children)
+
+        best_score = min(scores)
+        for child, score in zip(self.tree.root.children, scores):
+            if score == best_score:
+                moves.append(child.move)
+                nodes_moves.append(child)
+
+        assert len(moves) != 0
         rand_index = np.random.randint(len(moves))
         move = moves[rand_index]
         piece_to_move = self.board.get_piece_from_position(move[0])
         self.board.Move(piece_to_move, move[1])
-        (self.tree).trim_from_node(nodes_moves[rand_index])
-        (self.tree).grow_leaves(1)
+        self.tree.trim_from_node(nodes_moves[rand_index])
+        self.tree.grow_leaves(1)
