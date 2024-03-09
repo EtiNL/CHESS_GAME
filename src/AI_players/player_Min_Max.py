@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
 from multiprocessing import Pool
+import time
 
 class Node:
     def __init__(self, score, move, board):
@@ -134,9 +135,13 @@ class Tree:
             self.leaves = next_leaves
         else:
             color_to_play = 'w' if (self.leaves[0]).board.color_to_play == 'b' else 'b'
-            args = [(node,) for node in self.leaves]
-            with Pool() as p:
-                result_leaves = p.map(self.grow_leaves_helper, args)
+            result_leaves = []
+            for i in range(len(self.leaves)//20):
+                print(i)
+                args = [(node,) for node in self.leaves[i*20:(i+1)*20]]
+                with Pool() as p:
+                    result_leaves+=p.map(self.grow_leaves_helper, args)
+
             next_leaves = []
             for i,leaves in enumerate(result_leaves):
                 for leaf in leaves:
@@ -198,12 +203,13 @@ class Player_Min_Max:
             if child.move == move:
                 move_in_tree = True
                 (self.tree).trim_from_node(child)
+                visualize_tree(self.tree.root)
                 (self.tree).grow_leaves(1)
                 break
         if not move_in_tree:
             self.tree = Tree(0, [], self.board, self.eval_func)
             self.tree.grow_leaves(self.depth)
-        # visualize_tree(self.tree.root)
+        visualize_tree(self.tree.root)
 
     def evaluate_move(self, node):
         return min_max(node, self.depth, self.color == 'w')
@@ -211,20 +217,49 @@ class Player_Min_Max:
     def self_move(self):
         moves = []
         nodes_moves = []
+        if self.color=='w':
+            best_score = float('-inf')
+            for child in self.tree.root.children:
+                score = self.evaluate_move(child)
+                if score == best_score:
+                    moves.append(child.move)
+                    nodes_moves.append(child)
+                elif score > best_score:
+                    best_score = score
+                    moves = [child.move]
+                    nodes_moves = [child]
+                else:
+                    pass
 
-        with Pool() as p:
-            scores = p.map(self.evaluate_move, self.tree.root.children)
+        else:
+            best_score = float('inf')
+            for child in self.tree.root.children:
+                # start = time.time()
+                score = self.evaluate_move(child)
+                if score == best_score:
+                    moves.append(child.move)
+                    nodes_moves.append(child)
+                elif score < best_score:
+                    best_score = score
+                    moves = [child.move]
+                    nodes_moves = [child]
+                else:
+                    pass
+                # print(time.time()-start)
 
-        best_score = min(scores)
-        for child, score in zip(self.tree.root.children, scores):
-            if score == best_score:
-                moves.append(child.move)
-                nodes_moves.append(child)
+        # print(best_score)
+
 
         assert len(moves) != 0
+        print(len(moves))
         rand_index = np.random.randint(len(moves))
         move = moves[rand_index]
         piece_to_move = self.board.get_piece_from_position(move[0])
         self.board.Move(piece_to_move, move[1])
         self.tree.trim_from_node(nodes_moves[rand_index])
+        print('ok')
+        visualize_tree(self.tree.root)
         self.tree.grow_leaves(1)
+
+        print('alright')
+        print(' ')
